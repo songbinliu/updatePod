@@ -29,4 +29,11 @@ There are four steps:
  * Delete the original Pod via client.API;
  * Create a new Pod based on the new configuration via client.API.
 
-As shown in the function *testKillUpdatePod()*, this way works well.
+As shown in the function *testKillUpdatePod()*, this way works well.  
+It should be noted that ** If you set the Pod.Spec.NodeName ** when call the Create() API:
+  * If the NodeName is correct, then the scheduler will bind this Pod to the Node directly;
+  * If the NodeName is wrong, the scheduler will schedule it a to a fit Pod.
+  
+ 
+ ## Update Pod.scheduler by Update ReplicationController.Template ##
+ Some Pod is controlled by ReplicationController, so if you
