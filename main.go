@@ -1,20 +1,13 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+When to reschedule a Pod with our own scheduler, we needs to change the scheduler-name of the Pod.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+This piece of code is to test how to update a Pod's scheduler-name:
+(1) If pod is created by ReplicationController, then set the scheduler.name in the ReplicationController.Template;
+(2) If the Pod is created without a ReplicationController/ReplicateSet, then kill & re-create with the new scheduler.name;
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 */
 
-// Note: the example only works with the code within the same release/branch.
+// Note: only works with kubernetes 1.6+.
 package main
 
 import (
@@ -173,9 +166,6 @@ func copyPodInfo(oldPod, newPod *v1.Pod) {
 }
 
 func testKillUpdatePod(kclient *kubernetes.Clientset, nameSpace, podName, schedulerName string) error {
-	//ns := "default"
-	//podName := "cpu-group-mc6md"
-
 	client := kclient.CoreV1().Pods(nameSpace)
 	//1. get
 	option := metav1.GetOptions{}
@@ -203,6 +193,8 @@ func testKillUpdatePod(kclient *kubernetes.Clientset, nameSpace, podName, schedu
 	npod := &v1.Pod{}
 	copyPodInfo(pod, npod)
 	npod.Spec.SchedulerName = newScheduler
+	/* if we set the NodeName, then the default scheduler will bind it to the Node directly;
+	 so we don't have to set the scheduler name. */
 	//npod.Spec.NodeName = "ip-172-23-1-39.us-west-2.compute.internal"
 	npod, err = client.Create(npod)
 	if err != nil {
@@ -221,9 +213,6 @@ func testKillUpdatePod(kclient *kubernetes.Clientset, nameSpace, podName, schedu
 }
 
 func testUpdateController(client *kubernetes.Clientset, nameSpace, rcName, schedulerName string) error {
-	//ns := "default"
-	//rcName := "cpu-group"
-
 	rcClient := client.CoreV1().ReplicationControllers(nameSpace)
 
 	//1. get
@@ -268,9 +257,14 @@ func main() {
 
 	testPod(kubeclient)
 
+	//will fail:failed to update Pod:Pod "myschedule-cpu-80" is invalid: spec: 
+	// Forbidden: pod updates may not change fields other than `containers[*].image` or `spec.activeDeadlineSeconds` or `spec.tolerations` 
+	//(only additions to existing tolerations)
 	testUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
 
+	//Kill & reCreate it
 	testKillUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
 
+	//Update ReplicationController, kill & wait for RC to reCreate it.
 	testUpdateController(kubeclient, *nameSpace, *rcName, *schedulerName)
 }
