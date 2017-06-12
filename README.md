@@ -36,4 +36,11 @@ It should be noted that ** If you set the Pod.Spec.NodeName ** when call the Cre
   
  
  ## Update Pod.scheduler by Update ReplicationController.Template ##
- Some Pod is controlled by ReplicationController, so if you
+ Some Pod is controlled by ReplicationController (RC), so it is necessary to make assure Pods created by the RC will be scheduled by our scheduler.  Fortunately, we can update the setting of the RC directly via API.
+ ```go
+ client.CoreV1().ReplicationControllers(nameSpace).Update(newRC)
+ ```
+ As shown in the function of *testUpdateController()*, we update the scheduler name of by update the RC. Then after one of its
+ Pod is deleted, a new Pod will be scheduled by the desinated scheduler.
+ 
+ 
