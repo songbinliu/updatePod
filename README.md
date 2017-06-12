@@ -44,3 +44,8 @@ It should be noted that ** If you set the Pod.Spec.NodeName ** when call the Cre
  Pod is deleted, a new Pod will be scheduled by the desinated scheduler.
  
  
+## Run it ##
+
+```bash
+./updatekube --kubeConfig ./configs/aws.kubeconfig.yaml --nameSpace default --scheduler-name xyzscheduler --alsologtostderr
+```
