@@ -13,7 +13,9 @@ kclient.CoreV1().Pods(ns).Update(nPod)
 ```
 
 ```console
-failed to update Pod:Pod "myschedule-cpu-80" is invalid: spec: Forbidden: pod updates may not change fields other than `containers[*].image` or `spec.activeDeadlineSeconds` or `spec.tolerations` (only additions to existing tolerations)
+failed to update Pod:Pod "myschedule-cpu-80" is invalid: 
+spec: Forbidden: pod updates may not change fields other than `containers[*].image` 
+or `spec.activeDeadlineSeconds` or `spec.tolerations` (only additions to existing tolerations)
 ```
 
 ## Update Pod.scheduler by kill & create ##
