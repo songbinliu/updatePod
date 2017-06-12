@@ -100,9 +100,6 @@ func getKubeClient() *kubernetes.Clientset {
 }
 
 func testUpdatePod(kclient *kubernetes.Clientset, ns, podName, schedulerName string) error {
-	//ns := "default"
-	//podName := "myschedule-cpu-80"
-
 	client := kclient.CoreV1().Pods(ns)
 	//1. get
 	option := metav1.GetOptions{}
