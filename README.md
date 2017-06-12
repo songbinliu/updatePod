@@ -4,8 +4,9 @@ When to reschedule a Pod with our own scheduler, we needs to change the schedule
 This piece of code is to test how to update a Pod's scheduler-name.
 
 Usually, Pod will be created by in two ways: by ReplicationControler/ReplicateSet, or created directly.
-  * If pod is created by ReplicationController, then set the scheduler.name in the ReplicationController.Template;
   * If the Pod is created without a ReplicationController/ReplicateSet, then kill & re-create with the new scheduler.name;
+  * If pod is created by ReplicationController, then set the scheduler.name in the ReplicationController.Template;
+
 
 ## Update Pod.scheduler via Client.Pods().Update() API ##
 As shown in the function *testUpdatePod()*, it is impossible to update Pod's scheduler name with this API.
@@ -21,3 +22,8 @@ or `spec.activeDeadlineSeconds` or `spec.tolerations` (only additions to existin
 ```
 
 ## Update Pod.scheduler by kill & create ##
+First copy the original Pod's necessary information, and modify the scheduler-name; 
+second, delete the original Pod; 
+third, create the new Pod.
+
+It works well in this way.
