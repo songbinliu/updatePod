@@ -22,8 +22,11 @@ or `spec.activeDeadlineSeconds` or `spec.tolerations` (only additions to existin
 ```
 
 ## Update Pod.scheduler by kill & create ##
-First copy the original Pod's necessary information, and modify the scheduler-name; 
-second, delete the original Pod; 
-third, create the new Pod.
+There are four steps:
+ * Get the original Pod via client.API;
+ * Copy necessary information from the orinial Pod;
+ * Modify the new Pod's configuration-- the scheduler-name;
+ * Delete the original Pod via client.API;
+ * Create a new Pod based on the new configuration via client.API.
 
-It works well in this way.
+As shown in the function *testKillUpdatePod()*, this way works well.
