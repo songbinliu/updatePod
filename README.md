@@ -8,7 +8,7 @@ This piece of code is to test how to update a Pod's scheduler-name:
 ## Update Pod.scheduler via Client.Pods().Update() API ##
 As shown in the function *testUpdatePod()*, it is impossible to update Pod's scheduler name with this API.
 ```go
-#impossible to update Pod's scheduler-name via this API.
+# impossible to update Pod's scheduler-name via this API.
 kclient.CoreV1().Pods(ns).Update(nPod)
 ```
 
