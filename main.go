@@ -14,6 +14,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang/glog"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/v1"
@@ -65,8 +67,7 @@ func setFlags() {
 	schedulerName = flag.String("scheduler-name", "default-scheduler", "the name of the scheduler")
 
 	flag.Parse()
-
-	fmt.Printf("kubeConfig=%s, masterUrl=%s\n", *kubeConfig, *masterUrl)
+	flag.Set("logtostderr", "true")
 }
 
 func getKubeClient() *kubernetes.Clientset {
@@ -190,7 +191,7 @@ func testKillUpdatePod(kclient *kubernetes.Clientset, nameSpace, podName, schedu
 	copyPodInfo(pod, npod)
 	npod.Spec.SchedulerName = newScheduler
 	/* if we set the NodeName, then the default scheduler will bind it to the Node directly;
-	 so we don't have to set the scheduler name. */
+	so we don't have to set the scheduler name. */
 	//npod.Spec.NodeName = "ip-172-23-1-39.us-west-2.compute.internal"
 	npod, err = client.Create(npod)
 	if err != nil {
@@ -243,6 +244,8 @@ func testUpdateController(client *kubernetes.Clientset, nameSpace, rcName, sched
 func main() {
 	setFlags()
 	fmt.Printf("kubeConfig=%v, masterUrl=%v\n", *kubeConfig, *masterUrl)
+	glog.V(1).Info("begin tests")
+	defer glog.V(1).Info("end of tests")
 
 	kubeclient := getKubeClient()
 	if kubeclient == nil {
@@ -252,8 +255,8 @@ func main() {
 
 	testPod(kubeclient)
 
-	//will fail:failed to update Pod:Pod "myschedule-cpu-80" is invalid: spec: 
-	// Forbidden: pod updates may not change fields other than `containers[*].image` or `spec.activeDeadlineSeconds` or `spec.tolerations` 
+	//will fail:failed to update Pod:Pod "myschedule-cpu-80" is invalid: spec:
+	// Forbidden: pod updates may not change fields other than `containers[*].image` or `spec.activeDeadlineSeconds` or `spec.tolerations`
 	//(only additions to existing tolerations)
 	testUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
 
