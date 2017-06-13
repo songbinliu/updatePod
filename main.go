@@ -4,7 +4,6 @@ When to reschedule a Pod with our own scheduler, we needs to change the schedule
 This piece of code is to test how to update a Pod's scheduler-name:
 (1) If pod is created by ReplicationController, then set the scheduler.name in the ReplicationController.Template;
 (2) If the Pod is created without a ReplicationController/ReplicateSet, then kill & re-create with the new scheduler.name;
-
 */
 
 // Note: only works with kubernetes 1.6+.
@@ -242,9 +241,8 @@ func testUpdateController(client *kubernetes.Clientset, nameSpace, rcName, sched
 }
 
 func main() {
-
 	setFlags()
-	fmt.Printf("kubeConfig=%s, masterUrl=%s\n", *kubeConfig, *masterUrl)
+	fmt.Printf("kubeConfig=%v, masterUrl=%v\n", *kubeConfig, *masterUrl)
 
 	kubeclient := getKubeClient()
 	if kubeclient == nil {
