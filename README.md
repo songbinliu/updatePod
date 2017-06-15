@@ -64,6 +64,6 @@ build and run this project.
 you will see something like this:
 ```console
 I0615 10:27:09.745468    9407 scheduler.go:254] Attempting to schedule pod: default/myschedule-cpu-80
-I0615 10:27:09.746095    9407 factory.go:706] Attempting to bind myschedule-cpu-80 to ip-172-23-1-12.us-west-2.compute.internal
-I0615 10:27:09.836120    9407 event.go:218] Event(v1.ObjectReference{Kind:"Pod", Namespace:"default", Name:"myschedule-cpu-80", UID:"b7393f1f-51d6-11e7-9ecb-0615046e67da", APIVersion:"v1", ResourceVersion:"10089897", FieldPath:""}): type: 'Normal' reason: 'Scheduled' Successfully assigned myschedule-cpu-80 to ip-172-23-1-12.us-west-2.compute.internal
+I0615 10:27:09.746095    9407 factory.go:706] Attempting to bind myschedule-cpu-80 to ip-2-3-1-12.us-west-2.compute.internal
+I0615 10:27:09.836120    9407 event.go:218] Event(v1.ObjectReference{Kind:"Pod", Namespace:"default", Name:"myschedule-cpu-80", UID:"b7393f1f-51d6-11e7-9ecb-0615046e67da", APIVersion:"v1", ResourceVersion:"10089897", FieldPath:""}): type: 'Normal' reason: 'Scheduled' Successfully assigned myschedule-cpu-80 to ip-2-3-1-12.us-west-2.compute.internal
 ```
