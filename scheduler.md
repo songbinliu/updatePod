@@ -24,7 +24,9 @@ Note3: we will check the procedure of the pod creatation by "kubectl get events"
 | 1 | without schedulerName | scheduled by the "default-scheduler" |
 | 2 | with schedulerName="default-scheduler" | scheduled by the "default-scheduler" |
 | 3 | with schedulerName="xyzscheduler" | scheduled by the "xyzscheduler" |
-| 4 | with schedulerName="slow-xyzscheduler" | scheduled, not by "slow-xyzscheduler", no event indicating by "default-scheduler" |
+| 4 | with schedulerName="slow-xyzscheduler" | scheduled, but not by "slow-xyzscheduler", and no event indicating by "default-scheduler" |
+| 5 | with schedulerName="none-exist" | scheduled, but no event indicating by "default-scheduler" |
+| 6 | with schedulerName="none-exist", and a nodeSelector which cannot be matched | cannot be scheduled, keep pending |
 
 
 ## Conclusions ##
