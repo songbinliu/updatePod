@@ -4,12 +4,26 @@
  
  ## Different situations ##
  
-The behaviour of Pod scheduluation in different situations including:
+This experiments will test the behaviour of Pod scheduluation in different situations:
 
 * 1. create a Pod without setting the schedulerName;
 * 2. create a Pod with schedulerName to "default-scheduler";
 * 3. create a Pod with a customer schedulerName (xyzscheduler in the tests);
-* 4. create a Pod with a non-exist schedulerName;
-* 5. create a Pod with a customer schedulerName, but this scheduler is very slow;
+* 4. create a Pod with a customer schedulerName, but this scheduler is very slow;
     (sleep for about 30 seconds before doing the schedule)
+* 5. create a Pod with a non-exist schedulerName;
+* 6. create a Pod with a non-exist schedulerName, and the Pod has a nodeSelector which cannot be matched in the cluster;
+
+Note1: "default-scheduler" is Kubernetes' default scheduler name;
+Note2: the "xyzscheduler" is built from k8s.io/Kubernetes/plugin/cmd/kube-scheduler/;
+Note3: we will check the procedure of the pod creatation by "kubectl get events"
+
+## Results ##
+| index | description | result|
+|-|-|-|
+| 1 | without schedulerName | scheduled by the "default-scheduler" |
+
+## Conclusions ##
+
+
     
