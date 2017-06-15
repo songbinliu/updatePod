@@ -47,7 +47,7 @@ It should be noted that **If you set the Pod.Spec.NodeName** when call the Creat
 ## Run it ##
 
 ### start up another scheduler for Kubernetes ###
-we can build and run the default scheduler of Kubernetes
+we can build from the default scheduler, and run another scheduler for Kubernetes
 ```console
 go get k8s.io/kubernetes
 cd $GOPATH/src/k8s.io/kubernetes/plugin/cmd/kube-scheduler
