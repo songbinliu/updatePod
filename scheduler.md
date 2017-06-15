@@ -32,6 +32,10 @@ Note4: we will check the procedure of the pod creatation by "kubectl get events"
 
 
 ## Conclusions ##
+Based on the test results, we can get the following conclusion:
+```console
+ If the cumstomer scheduler is slow, it will lose the oppotunity to schedule the Pod; Even if the Pod is assigned to that customer scheduler.
+ ```
 
 
     
