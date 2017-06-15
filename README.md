@@ -54,7 +54,7 @@ cd $GOPATH/src/k8s.io/kubernetes/plugin/cmd/kube-scheduler
 go build
 
 #run it
-./kube-scheduler --kubeconfig ./aws.kubeconfig.yaml --logtostderr --v 3 --scheduler-name xyzscheduler --leader-elect=false
+./kube-scheduler --kubeconfig ./aws.kubeconfig.yaml --scheduler-name xyzscheduler --leader-elect=false --logtostderr --v 3 
 ```
 ### test whether the scheduler-name is update ###
 build and run this project.
