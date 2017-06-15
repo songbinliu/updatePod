@@ -1,5 +1,5 @@
- # Experiments about Kubernetes scheduling policy #
- Before reading the code of Kubernetes ApiServer and kubelete, some experiments are done to have a initial understanding
+ # Experiment about Kubernetes scheduling policy #
+ Before reading the code of Kubernetes ApiServer and kubelete, some tests are done to have a initial understanding
  of Kubernetes scheduling policies.
  
  ## Different situations ##
