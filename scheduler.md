@@ -32,7 +32,7 @@ Note2: the "xyzscheduler" is built from k8s.io/kubernetes/plugin/cmd/kube-schedu
 Note3: the "slow-xyzscheduler" is also built from k8s.io/kubernetes/plugin/cmd/kube-scheduler/, with one-line modification: 
 sleep 30 seconds in the scheduler.scheduleOne() function before caling shed.schedule(pod);
 
-Note4: we will check the procedure of the pod creatation by "kubectl get events"
+Note4: we get to know which scheduler did the scheduling by "kubectl get events", and the logs of "xyzscheduler" and "slow-xyzscheduler".
 
 
 ## Conclusions ##
