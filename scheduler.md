@@ -27,9 +27,9 @@ This experiments will test the behaviour of Pod scheduluation in different situa
 
 Note1: "default-scheduler" is Kubernetes' default scheduler name;
 
-Note2: the "xyzscheduler" is built from k8s.io/Kubernetes/plugin/cmd/kube-scheduler/;
+Note2: the "xyzscheduler" is built from k8s.io/kubernetes/plugin/cmd/kube-scheduler/;
 
-Note3: the "slow-xyzscheduler" is also built from k8s.io/Kubernetes/plugin/cmd/kube-scheduler/, with one-line modification: 
+Note3: the "slow-xyzscheduler" is also built from k8s.io/kubernetes/plugin/cmd/kube-scheduler/, with one-line modification: 
 sleep 30 seconds in the scheduler.scheduleOne() function before caling shed.schedule(pod);
 
 Note4: we will check the procedure of the pod creatation by "kubectl get events"
@@ -43,7 +43,7 @@ Based on the test results, we can get the following conclusion:
  ```
 
 ## Discussion ##
-Based on the source code of k8s.io/Kubernetes/plugin/cmd/kube-scheduler/, when the default scheduler gets an unscheduled Pod, the default scheduler will check whether the Pod's schedulerName equals to its own name. If the schedulerName matches, the default scheduler will do the scheduling for the Pod; otherwise, the default scheduler won't schedule the Pod.
+Based on the source code of k8s.io/kubernetes/plugin/cmd/kube-scheduler/, when the default scheduler gets an unscheduled Pod, the default scheduler will check whether the Pod's schedulerName equals to its own name. If the schedulerName matches, the default scheduler will do the scheduling for the Pod; otherwise, the default scheduler won't schedule the Pod.
 
 But in this experiments, if a Pod has a schedulerName, and the scheduler is slow, then the Pod will be scheduled by someone else. I am afraid that there is some bug, or other constrains in Kubernetes scheduler framework. It is necessary to read the code of the ApiServer to know what it will do in this situation.
 
