@@ -45,7 +45,7 @@ Based on the test results, we can get the following conclusion:
 ## Discussion ##
 Based on the source code of k8s.io/kubernetes/plugin/cmd/kube-scheduler/, when the default scheduler gets an unscheduled Pod, the default scheduler will check whether the Pod's schedulerName equals to its own name. If the schedulerName matches, the default scheduler will do the scheduling for the Pod; otherwise, the default scheduler won't schedule the Pod.
 
-But in this experiments, if a Pod has a schedulerName, and the scheduler is slow, then the Pod will be scheduled by someone else. I am afraid that there is some bug, or other constrains in Kubernetes scheduler framework. It is necessary to read the code of the ApiServer to know what it will do in this situation.
+But in this experiment, if a Pod has a schedulerName, and the scheduler is slow, then the Pod will be scheduled by someone else. I am afraid that there is some bug, or other unknown constrains in Kubernetes scheduler framework. It is necessary to read the code of the ApiServer to know what it will do if the customer scheduler is slow.
 
 
     
