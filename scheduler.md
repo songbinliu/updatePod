@@ -47,5 +47,6 @@ Based on the source code of k8s.io/kubernetes/plugin/cmd/kube-scheduler/, when t
 
 But in this experiment, if a Pod has a schedulerName, and the scheduler is slow, then the Pod will be scheduled by someone else. I am afraid that there is some bug, or other unknown constrains in Kubernetes scheduler framework. It is necessary to read the code of the ApiServer to know what it will do if the customer scheduler is slow.
 
-
+## TODO ##
+Stop the default-scheduler in the Kubernetes cluster, and test the slow scheduler then.
     
