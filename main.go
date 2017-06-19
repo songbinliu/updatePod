@@ -51,6 +51,7 @@ func printPods(pods *v1.PodList) {
 
 func testPod(client *kubernetes.Clientset) {
 	pods, err := client.CoreV1().Pods("").List(metav1.ListOptions{})
+	//pods, err := client.Pods("").List(metav1.ListOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -219,9 +220,14 @@ func testUpdateController(client *kubernetes.Clientset, nameSpace, rcName, sched
 		fmt.Printf("failed to get ReplicationController:%v\n", err)
 		return err
 	}
-	fmt.Printf("ReplicationController:%v\n", rc.Spec.Template.Spec.SchedulerName)
+	fmt.Printf("ReplicationController:%v, replicaNum:%v\n",
+		rc.Spec.Template.Spec.SchedulerName,
+		*rc.Spec.Replicas)
 
 	//2. update
+	//*rc.Spec.Replicas = *(rc.Spec.Replicas) + 1
+	p := rc.Spec.Replicas
+	*p = *p - 1
 	newScheduler := schedulerName
 	rc.Spec.Template.Spec.SchedulerName = newScheduler
 	rc, err = rcClient.Update(rc)
@@ -236,9 +242,33 @@ func testUpdateController(client *kubernetes.Clientset, nameSpace, rcName, sched
 		fmt.Printf("failed to get ReplicationController:%v\n", err)
 		return err
 	}
-	fmt.Printf("ReplicationController:%v\n", rc.Spec.Template.Spec.SchedulerName)
+	fmt.Printf("ReplicationController:%v, replicaNum:%v\n",
+		rc.Spec.Template.Spec.SchedulerName,
+		*rc.Spec.Replicas)
 
 	return nil
+}
+
+func testScaleUpController(client *kubernetes.Clientset, nameSpace, rcName, schedulerName string) error {
+	rcClient := client.CoreV1().ReplicationControllers(nameSpace)
+
+	//1. get
+	option := metav1.GetOptions{}
+	rc, err := rcClient.Get(rcName, option)
+	if err != nil {
+		fmt.Printf("failed to get ReplicationController:%v\n", err)
+		return err
+	}
+	fmt.Printf("ReplicationController:%v, replicaNum:%v\n",
+		rc.Spec.Template.Spec.SchedulerName,
+		*rc.Spec.Replicas)
+	return nil
+}
+
+func testErrorf() {
+	err := fmt.Errorf("bad input: %s Vs. %s", "abc", "ebc")
+	glog.Error(err.Error())
+	return
 }
 
 func main() {
@@ -265,4 +295,8 @@ func main() {
 
 	//Update ReplicationController, kill & wait for RC to reCreate it.
 	testUpdateController(kubeclient, *nameSpace, *rcName, *schedulerName)
+
+	testScaleUpController(kubeclient, *nameSpace, *rcName, *schedulerName)
+
+	testErrorf()
 }
