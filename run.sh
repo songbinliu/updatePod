@@ -9,7 +9,7 @@ options="--kubeConfig ./configs/aws.kubeconfig.yaml "
 options=" $options --nameSpace default "
 options=" $options --scheduler-name xyzscheduler "
 #options=" $options --scheduler-name my-scheduler "
-options=" $options --alsologtostderr --v 2"
+options=" $options --alsologtostderr --v 3"
 
 
 

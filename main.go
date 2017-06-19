@@ -12,6 +12,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/golang/glog"
@@ -217,7 +220,7 @@ func testUpdateController(client *kubernetes.Clientset, nameSpace, rcName, sched
 	option := metav1.GetOptions{}
 	rc, err := rcClient.Get(rcName, option)
 	if err != nil {
-		fmt.Printf("failed to get ReplicationController:%v\n", err)
+		glog.Errorf("failed to get ReplicationController:%v\n", err)
 		return err
 	}
 	fmt.Printf("ReplicationController:%v, replicaNum:%v\n",
@@ -227,12 +230,16 @@ func testUpdateController(client *kubernetes.Clientset, nameSpace, rcName, sched
 	//2. update
 	//*rc.Spec.Replicas = *(rc.Spec.Replicas) + 1
 	p := rc.Spec.Replicas
-	*p = *p - 1
+	if *p > 3 {
+		*p -= 1
+	} else {
+		*p += 1
+	}
 	newScheduler := schedulerName
 	rc.Spec.Template.Spec.SchedulerName = newScheduler
 	rc, err = rcClient.Update(rc)
 	if err != nil {
-		fmt.Printf("failed to update RC:%v\n", err)
+		glog.Warningf("failed to update RC:%v\n", err)
 		return err
 	}
 
@@ -249,20 +256,133 @@ func testUpdateController(client *kubernetes.Clientset, nameSpace, rcName, sched
 	return nil
 }
 
+func getLabelSelector(rc *v1.ReplicationController) string {
+	glog.V(3).Infof("selectors = %d", len(rc.Spec.Selector))
+	data := make([]string, len(rc.Spec.Selector))
+	i := 0
+	for key, value := range rc.Spec.Selector {
+		glog.V(2).Infof("key=[%s],val=[%s]", key, value)
+		data[i] = key + "=" + value
+		i++
+	}
+
+	if len(data) == 1 {
+		return data[0]
+	} else {
+		glog.V(3).Infof("selectors = %d", len(data))
+	}
+
+	sort.StringSlice(data).Sort()
+	return strings.Join(data, ",")
+}
+
+func selectNode(nodes *[]string) string {
+	idx := rand.Intn(len(*nodes))
+	return (*nodes)[idx]
+}
+
+func selectPod(pods *v1.PodList) *v1.Pod {
+
+	idx := rand.Intn(len(pods.Items))
+	return &(pods.Items[idx])
+}
+
+func genListOption(rc *v1.ReplicationController) *metav1.ListOptions {
+	labelSelector := getLabelSelector(rc)
+	glog.V(2).Infof("labelSelector:[%v]", labelSelector)
+	fieldSelector := "status.phase=" + string(v1.PodRunning)
+	loption := metav1.ListOptions{LabelSelector: labelSelector,
+		FieldSelector: fieldSelector,
+	}
+
+	return &loption
+}
+
 func testScaleUpController(client *kubernetes.Clientset, nameSpace, rcName, schedulerName string) error {
 	rcClient := client.CoreV1().ReplicationControllers(nameSpace)
+	podClient := client.CoreV1().Pods(nameSpace)
+
+	nodes, err := testGetNode(client)
+	glog.V(2).Infof("nodes:[%v], [%v]\n", nodes, (*nodes)[0])
 
 	//1. get
 	option := metav1.GetOptions{}
 	rc, err := rcClient.Get(rcName, option)
 	if err != nil {
-		fmt.Printf("failed to get ReplicationController:%v\n", err)
+		glog.Errorf("failed to get ReplicationController:%v\n", err)
 		return err
 	}
-	fmt.Printf("ReplicationController:%v, replicaNum:%v\n",
+	glog.V(2).Infof("ReplicationController:%v, replicaNum:%v\n",
 		rc.Spec.Template.Spec.SchedulerName,
 		*rc.Spec.Replicas)
+
+	//2. move: kill one pod, and create another pod.
+	lstOption := genListOption(rc)
+	pods, err := podClient.List(*lstOption)
+	if err != nil {
+		glog.Errorf("failed to get Pods for rc:%s\n%v", rcName, err.Error())
+		return err
+	}
+
+	if len(pods.Items) < 1 {
+		glog.Warningf("no living Pods for rc:%s\n", rcName)
+		return nil
+	}
+
+	//2.1 select a pod, and copy it
+	pod := selectPod(pods)
+	npod := &v1.Pod{}
+	copyPodInfo(pod, npod)
+	npod.Name = pod.Name + "mv"
+
+	// if NodeName is not set, then ReplicationController will create another pod sooner than me.
+	nodeName := selectNode(nodes)
+	npod.Spec.NodeName = nodeName
+	glog.V(3).Infof("nodeName=[%s], [%s]\n", nodeName, npod.Spec.NodeName)
+
+	//2.2 kill the pod
+	var duration int64 = 5
+	delOption := &metav1.DeleteOptions{
+		GracePeriodSeconds: &duration,
+	}
+	glog.V(2).Infof("begin to kill pod:%v", pod.Name)
+	err = podClient.Delete(pod.Name, delOption)
+	if err != nil {
+		glog.Errorf("failed to delete pod:%v\n%v\n", pod.Name, err)
+		return err
+	}
+
+	//2.3 create the new Pod
+	glog.V(2).Infof("begin to create pod:%v on %v", npod.Name, npod.Spec.NodeName)
+	npod, err = podClient.Create(npod)
+	if err != nil {
+		glog.Errorf("failed to create Pod:%v\n%v\n", npod.Name, err)
+		return err
+	}
+
 	return nil
+}
+
+func testGetNode(client *kubernetes.Clientset) (*[]string, error) {
+	rcClient := client.CoreV1().Nodes()
+
+	option := metav1.ListOptions{}
+	nodeList, err := rcClient.List(option)
+	if err != nil {
+		fmt.Printf("failed to get list: %v\n", err.Error())
+		return nil, err
+	}
+
+	fmt.Printf("There are %v nodes:\n", len(nodeList.Items))
+
+	result := make([]string, len(nodeList.Items))
+
+	for i, node := range nodeList.Items {
+		//fmt.Printf("%v\n", node.Name)
+		result[i] = node.Name
+	}
+
+	return &result, nil
 }
 
 func testErrorf() {
@@ -288,13 +408,14 @@ func main() {
 	//will fail:failed to update Pod:Pod "myschedule-cpu-80" is invalid: spec:
 	// Forbidden: pod updates may not change fields other than `containers[*].image` or `spec.activeDeadlineSeconds` or `spec.tolerations`
 	//(only additions to existing tolerations)
-	testUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
+	//testUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
 
-	//Kill & reCreate it
-	testKillUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
+	////Kill & reCreate it
+	//testKillUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
 
 	//Update ReplicationController, kill & wait for RC to reCreate it.
 	testUpdateController(kubeclient, *nameSpace, *rcName, *schedulerName)
+	time.Sleep(time.Second * 10)
 
 	testScaleUpController(kubeclient, *nameSpace, *rcName, *schedulerName)
 
