@@ -1,5 +1,5 @@
  # Experiment about Kubernetes scheduling policy #
- Before reading the code of Kubernetes ApiServer and kubelete, some tests are done to have a initial understanding
+ Kubernetes 1.6 offers some [advanced scheduling features](http://blog.kubernetes.io/2017/03/advanced-scheduling-in-kubernetes.html), including cutomer scheduler. User can set [schedulerName](https://github.com/kubernetes/client-go/blob/master/pkg/api/v1/types.go#L2513) when creating new Pod. Before reading the code of Kubernetes ApiServer and kubelete, some tests are done to have a initial understanding
  of Kubernetes scheduling policies.
  
  ## Different situations ##
