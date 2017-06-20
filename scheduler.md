@@ -26,7 +26,7 @@ This experiments will test the behaviour of Pod scheduluation in different situa
 | 4 | with schedulerName="slow-xyzscheduler" | scheduled by "slow-xyzscheduler" |
 | 5 | with schedulerName="none-exist" | pending |
 | 6 | with schedulerName="none-exist", and a nodeSelector which cannot be matched | pending |
-| 7 | ReplicationController 3 replicas, schedulerName="xyzscheduler" | all 3 pods are scheduled by "xyzscheduler"|
+| 7 | ReplicationController 3 replicas, schedulerName="slow-xyzscheduler" | all 3 pods are scheduled by "slow-xyzscheduler"|
 | 8 | ReplicationController 3 replicas, schedulerName="none-exist" | all 3 pods are pending|
 
 
