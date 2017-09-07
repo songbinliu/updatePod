@@ -88,7 +88,7 @@ func testMovePod(client *kubernetes.Clientset, namespace, podName, nodeName stri
 
 	//2. copy and kill original pod
 	npod := &v1.Pod{}
-	copyPodInfo(pod, npod)
+	copyPodInfoX(pod, npod)
 	npod.Spec.NodeName = nodeName
 
 	var grace int64 = 0
@@ -102,6 +102,7 @@ func testMovePod(client *kubernetes.Clientset, namespace, podName, nodeName stri
 	}
 
 	//3. create (and bind) the new Pod
+	// time.Sleep(time.Second * 10) // this line is for experiments
 	_, err = podClient.Create(npod)
 	if err != nil {
 		err = fmt.Errorf("move-failed: failed to create new pod: %v/%v\n%v",
@@ -111,7 +112,7 @@ func testMovePod(client *kubernetes.Clientset, namespace, podName, nodeName stri
 	}
 
 	//4. check the new Pod
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Second * 2)
 	if err = checkPodLive(client, namespace, npod.Name); err != nil {
 		glog.Errorf("move-failed: check failed:%v\n", err.Error())
 		return
@@ -167,7 +168,7 @@ func main() {
 	//testUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
 
 	////Kill & reCreate it
-	testKillUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
+	//testKillUpdatePod(kubeclient, *nameSpace, *podName, *schedulerName)
 
 	////Update ReplicationController, kill & wait for RC to reCreate it.
 	//testUpdateController(kubeclient, *nameSpace, *rcName, *schedulerName)
@@ -177,5 +178,6 @@ func main() {
 
 	//testGetPodbyUUID(kubeclient, *nameSpace, *uuid)
 
-	//testMovePod(kubeclient, *nameSpace, *podName, *nodeName)
+	fmt.Println("not sleep")
+	testMovePod(kubeclient, *nameSpace, *podName, *nodeName)
 }
